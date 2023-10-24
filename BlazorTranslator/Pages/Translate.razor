@@ -1,0 +1,53 @@
+﻿@page "/translate"
+@using Seq2SeqModel.AttentionModel;
+@using TranslatorBlazor.Data.Models;
+@using TranslatorBlazor.Services;
+
+@inject FileService fileService;
+
+<h3>Translate</h3>
+
+<EditForm Model="@trainingModel" OnValidSubmit="TranslateModel">
+    <DataAnnotationsValidator />
+    <div class="col-2">
+        <label>Language</label>
+        <br />
+        <InputText id="languageOne" class="effect-1" @bind-Value="@trainingModel.LanguageOne" />
+    </div>
+    <div class="col-2">
+        <label>Text</label>
+        <br />
+        <InputTextArea class="textarea-style" id="languageOneText" placeholder="Enter text to translate" @bind-Value="@trainingModel.LanguageOneText" />
+    </div>
+    <div class="col-2">
+        <label>Language</label><br />
+        <InputText id="languageTwo" class="effect-1" @bind-Value="@trainingModel.LanguageTwo" />
+    </div>
+
+    <div class="col-2">
+        <label>Text</label><br />
+        <InputTextArea id="languageTwoText" class="textarea-style" @bind-Value="@trainingModel.LanguageTwoText" />
+    </div>
+    <ValidationSummary />
+    <div class="col-1">
+        <button class="custom-btn btn-6" type="submit">Translate</button>
+    </div>
+</EditForm>
+
+
+@code {
+    TrainingModel trainingModel = new TrainingModel();
+    private Seq2Seq Seq2SeqModel;
+
+    public void TranslateModel()
+    {
+        Seq2SeqModel = new Seq2Seq(64, 32, 1, true);
+        var model = fileService.GetFileModelData($"{trainingModel.LanguageOne}-{trainingModel.LanguageTwo}");
+
+        Seq2SeqModel.Load(model);
+
+        var result = Seq2SeqModel.Predict(trainingModel.LanguageOneText.ToLower().Trim().Split(' ').ToList());
+        trainingModel.LanguageTwoText = result.Aggregate((a, b) => $"{a} {b}");
+        this.StateHasChanged();
+    }
+}

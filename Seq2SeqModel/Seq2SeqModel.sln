@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Seq2SeqModel", "Seq2SeqModel.csproj", "{EEE87929-1E73-42AF-8B6D-787D875A35F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEE87929-1E73-42AF-8B6D-787D875A35F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE87929-1E73-42AF-8B6D-787D875A35F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE87929-1E73-42AF-8B6D-787D875A35F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE87929-1E73-42AF-8B6D-787D875A35F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {206D132A-712C-495B-8B15-93ED7E5441F7}
+	EndGlobalSection
+EndGlobal

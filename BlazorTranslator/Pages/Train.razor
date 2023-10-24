@@ -1,0 +1,104 @@
+﻿@page "/train"
+@using Seq2SeqModel.AttentionModel;
+@using Seq2SeqModel.Entities;
+@using TranslatorBlazor.Data.Models;
+@using TranslatorBlazor.Services;
+
+@inject FileService fileService;
+
+<h3>Train</h3>
+    <EditForm Model="@trainingModel" OnValidSubmit="TrainModel">
+    <DataAnnotationsValidator />
+    <div class="col-2">
+            <label>Language</label>
+        <br />
+            <InputText id="languageOne" class="effect-1" @bind-Value="@trainingModel.LanguageOne"/>
+        </div>
+    <div class="col-2">
+            <label>Text</label>
+        <br />
+        <InputTextArea id="languageOneText" class="textarea-style" placeholder="Enter text 1 to train" @bind-Value="@trainingModel.LanguageOneText" />
+        </div>
+    <div class="col-2">
+            <label>Language</label>
+        <br />
+        <InputText id="languageTwo" class="effect-1" @bind-Value="@trainingModel.LanguageTwo" />
+        </div>
+    <div class="col-2">
+            <label>Text</label>
+        <br />
+        <InputTextArea id="languageTwoText" class="textarea-style" placeholder="Enter text 2 to train" @bind-Value="@trainingModel.LanguageTwoText" />
+        </div>
+        <ValidationSummary />
+        <div class="col-2">
+            <button class="custom-btn btn-6" type="submit">Train</button>
+        </div>
+    </EditForm>
+    <div class="col-2">
+        <button class="custom-btn btn-6" type="button" @onclick="StopTraining">Cancel</button><br />
+        <label id="Iteration">Iteration: @iteration.ToString() </label><br/>
+        <label id="Cost">Cost: @cost.ToString() </label><br/>
+
+    </div>
+
+
+@code {
+
+    TrainingModel trainingModel = new TrainingModel();
+    TrainingModel translateModel = new TrainingModel();
+    public Seq2Seq Seq2SeqModel;
+    private Thread mainThread;
+    private int iteration;
+    private double cost;
+    ModelData model;
+
+    private void TrainModel()
+    {
+        var input = new List<List<string>>();
+        var output = new List<List<string>>();
+
+        var data1 = trainingModel.LanguageOneText.Split("\n").ToArray();
+        var data2 = trainingModel.LanguageTwoText.Split("\n").ToArray();
+
+        for (int i = 0; i < data1.Length; i++)
+        {
+            input.Add(data1[i].ToLower().Trim().Split(' ').ToList());
+            output.Add(data2[i].ToLower().Trim().Split(' ').ToList());
+        }
+
+        Seq2SeqModel = new Seq2Seq(64, 32, 1, input, output, true);
+        Seq2SeqModel.IterationDone += OnIterationDone;
+
+        mainThread = new Thread(new ThreadStart(StartTraining));
+        mainThread.Start();
+    }
+
+    private void StartTraining()
+    {
+        Seq2SeqModel.Train(300);
+
+        var model = Seq2SeqModel.Save();
+        fileService.AddFileModelData(model, $"{trainingModel.LanguageOne}-{trainingModel.LanguageTwo}");
+    }
+
+    private void StopTraining()
+    {
+        if (mainThread != null)
+            mainThread.Interrupt();
+
+        model = Seq2SeqModel.Save();
+        fileService.AddFileModelData(model, $"{trainingModel.LanguageOne}-{trainingModel.LanguageTwo}");
+    }
+
+    private void OnIterationDone(object sender, EventArgs args)
+    {
+        var costData = args as CostEvent;
+        iteration = costData.Iteration;
+        cost = costData.Cost;
+
+        InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+}

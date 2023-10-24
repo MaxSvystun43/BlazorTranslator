@@ -1,0 +1,21 @@
+﻿@page "/"
+@using TranslatorBlazor.Services;
+
+@inject FileService fileService;
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello in translation app!</h1>
+Posible translations:
+<br />
+
+<label>@Text</label>
+
+@code{
+    string Text = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        Text = fileService.GetAllTranslations();
+    }
+}
